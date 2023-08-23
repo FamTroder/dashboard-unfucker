@@ -15,7 +15,7 @@
 /* globals tumblr */
 
 'use strict';
-
+console.log("HEllo fuckers!!!");
 const version = "3.6.3";
 const type = "a";
 const updateSrc = "https://raw.githubusercontent.com/enchanted-sword/dashboard-unfucker/main/unfucker.user.js";
@@ -44,7 +44,6 @@ let featureSet = [
     {"name": "reblogRedesignNew", "value": false},
     {"name": "adFreeCtaBanner", "value": false}
 ];
-
 const storageAvailable = (type) => { //thanks mdn web docs!
     let storage;
     try {
@@ -283,7 +282,9 @@ $(document).ready(() => {
                 { type: "checkbox", value: "checked" },
                 { type: "checkbox", value: "checked" },
                 { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" }
+                { type: "checkbox", value: "checked" },
+                { type: "number", value: "20"},
+                { type: "number", value: "50"}
             ];
             if (storageAvailable("localStorage")) {
                 if (!localStorage.getItem("configPreferences") || JSON.parse(localStorage.getItem("configPreferences")).length < configPreferences.length) {
@@ -373,6 +374,14 @@ $(document).ready(() => {
                                 <span>hide tumblr shop</span>
                                 <input class="configInput" type="checkbox" id="__c5" name="4" ${configPreferences[4].value}>
                             </li>
+                            <li>
+                                <span>Change chat width (relative to screen width)</span>
+                                <input class="configInput" type="number" id="__chatw" name="17" value=${Number(configPreferences[17].value)}>
+                            </li>
+                            <li>
+                                <span>Change chat height (relative to screen height)</span>
+                                <input class="configInput" type="number" id="__chath" name="18" value=${Number(configPreferences[18].value)}>
+                            </li>
                         </ul>
                         <ul id="__cta">
                             <li class="infoHeader" style="flex-flow: column wrap">
@@ -421,11 +430,11 @@ $(document).ready(() => {
                             </li>
                             <li>
                                 <span>re-add unread post notifications to the corner of the home icon</span>
-                                <input class="configInput" type="checkbox" id="__c16" name="15" ${configPreferences[15].value}>
+                                <input class="configInput" type="checkbox" id="__c16" name="15" value=${configPreferences[15].value}>
                             </li>
                             <li>
                                 <span>revert post header changes</span>
-                                <input class="configInput" type="checkbox" id="__c17" name="16" ${configPreferences[16].value}>
+                                <input class="configInput" type="checkbox" id="__c17" name="16" value=${configPreferences[16].value}>
                             </li>
                         </ul>
                     </div>
@@ -448,9 +457,20 @@ $(document).ready(() => {
                 $("#__a").toggle();
             });
             $(".configInput").on("change", function () {
-                configPreferences[Number($(this).attr("name"))].value = $(this).is(":checked") ? "checked" : "";
-                checkboxEvent($(this).attr("id"), $(this).is(":checked"));
-                updatePreferences(configPreferences);
+                const curPreference= configPreferences[Number($(this).attr("name"))];
+                console.log("change: ");
+                console.log(curPreference);
+                console.log($(this));
+                if (curPreference.type === "checkbox"){
+                    curPreference.value = $(this).is(":checked") ? "checked" : "";
+                    checkboxEvent($(this).attr("id"), $(this).is(":checked"));
+                }
+                else if (curPreference.type === "number") {
+                    curPreference.value = Number($(this).prop("value"));
+                    updatePreferences(configPreferences);
+                    $(keyToCss("conversationWindow")).css("width",  $("#__chatw").prop("value") + "vw");
+                    $(keyToCss("conversationWindow")).css("height",  $("#__chath").prop("value") + "vh");
+                }
             });
             $(keyToCss("timelineHeader")).toggle(!$("#__c1").is(":checked"));
             $(keyToCss("menuContainer")).has('use[href="#managed-icon__explore"]').toggle(!$("#__c4").is(":checked"));
@@ -470,6 +490,9 @@ $(document).ready(() => {
                     ${keyToCss("navItem")}:has(use[href="#managed-icon__earth"]) { display: none !important; }
                 `);
             }
+            $(keyToCss("conversationWindow")).css("width",  $("#__chatw").prop("value") + "vw");
+            $(keyToCss("conversationWindow")).css("width",  $("#__chath").prop("value") + "vh");
+
             console.log("dashboard fixed!");
         }
 
