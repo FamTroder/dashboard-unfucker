@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         dashboard unfucker (no flags)
-// @version      4.1.4
+// @version      4.1.7
 // @description  no more shitty twitter ui for pc
 // @author       dragongirlsnout
 // @match        https://www.tumblr.com/*
@@ -15,7 +15,7 @@
 
 'use strict';
 
-const version = "4.1.4";
+const version = "4.1.7";
 const type = "b"
 const updateSrc = "https://raw.githubusercontent.com/enchanted-sword/dashboard-unfucker/main/unfucker-noflags.user.js";
 var $ = window.jQuery;
@@ -84,15 +84,22 @@ getUtilities().then(({ keyToClasses, keyToCss, tr }) => {
           const parent = $post.find(`[aria-label="${tr("Reblog")}"]`).attr("href").split("/")[2];
           if ($header.find(keyToCss("rebloggedFromName")).length) {
             $header.find(keyToCss("reblogged")).hide();
-            $header.find(keyToCss("reblogIcon")).insertBefore($header.find(keyToCss("rebloggedFromName")));
+            let $rebloggedFrom = $header.find(keyToCss("rebloggedFromName"));
+            let $reblogIcon = $header.find(keyToCss("reblogIcon"));
+            $reblogIcon.css("margin-left", "2px");
+            $reblogIcon.insertBefore($rebloggedFrom);
+            $rebloggedFrom.css("margin-left", "5px");
           } else if ($header.find(keyToCss("avatar")).length) {
             $header.find(keyToCss("avatar")).hide();
           } else {
             $header.find(keyToCss("reblogged")).hide();
             let $reblogIcon = $header.find(keyToCss("reblogIcon"));
+            $reblogIcon.css("margin-left", "2px");
             $reblogIcon.appendTo($header.find(keyToCss("attribution")));
+            $header.find($(keyToCss("followButton"))).eq(0).hide();
             let $label = $post.find(keyToCss("label")).eq(0).clone();
             $label.insertAfter($reblogIcon);
+            $label.css({display: "inline", marginLeft: "5px"});
             $label.find(keyToCss("attribution")).css("color", "rgba(var(--black),.65)");
           }
           if (isDashboard()) $post.prepend(newAvatar(parent));
@@ -469,6 +476,29 @@ getUtilities().then(({ keyToClasses, keyToCss, tr }) => {
         var $heading = $(`<div class="${keyToClasses("heading").join(" ")}"><h3>Account</h3></div>`);
         var $likeIcon = $(`<svg xmlns="http://www.w3.org/2000/svg" height="18" width="20" role="presentation" style="--icon-color-primary: rgba(var(--black), 0.65);"><use href="#managed-icon__like-filled"></use></svg>`);
         var $followingIcon = $(`<svg xmlns="http://www.w3.org/2000/svg" height="21" width="20" role="presentation" style="--icon-color-primary: rgba(var(--black), 0.65);"><use href="#managed-icon__following"></use></svg>`);
+        const ownName = $("#account_subnav").find($(keyToCss("displayName"))).eq(0).text();
+        var $ownAvatar = $(`
+          <div class="__avatarOuter" style="position: absolute; top: 0; left: -85px;">
+            <div class="__avatarWrapper" role="figure" aria-label="${tr("avatar")}">
+              <span data-testid="controlled-popover-wrapper" class="${keyToClasses("targetWrapper")}">
+                <span class="${keyToClasses("targetWrapper")}">
+                  <a href="https://${ownName}.tumblr.com/" title="${ownName}" target="_blank" rel="noopener" role="link" class="${keyToClasses("blogLink").join(" ")}" tabindex="0">
+                    <div class="__avatarInner" style="width: 64px; height: 64px;">
+                      <div class="__avatarWrapperInner">
+                        <div class="__placeholder" style="padding-bottom: 100%;">
+                          <img
+                            class="__avatarImage"
+                            src="https://api.tumblr.com/v2/blog/${ownName}/avatar"
+                            sizes="64px" alt="${tr("Avatar")}" style="width: 64px; height: 64px;" loading="eager">
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </span>
+              </span>
+            </div>
+          </div>`
+        );
         const $menu = $(`
         <div id="__m">
         <div id="__in">
@@ -600,6 +630,7 @@ getUtilities().then(({ keyToClasses, keyToCss, tr }) => {
           observer.observe(target, { childList: true, subtree: true });
         } else observer.disconnect;
         $create.detach();
+        $(keyToCss("bar")).prepend($ownAvatar);
         $(keyToCss("bluespaceLayout")).prepend($bar);
         $logo.detach()
         $bar.append($header)
@@ -850,7 +881,6 @@ getUtilities().then(({ keyToClasses, keyToCss, tr }) => {
         }
         $(`button[aria-label="${tr("Show Blog Statistics")}"`).eq(0).trigger("click");
         $(`[title="${tr("Settings")}"]`).hide();
-        if (["blog", "likes", "following"].includes(pathname)) { document.getElementById("account_button").click(); }
         $header.append($("<nav>"));
         waitFor(keyToCss("sidebar")).then(() => {
           $(keyToCss("sidebar")).prepend($menu);
@@ -858,9 +888,9 @@ getUtilities().then(({ keyToClasses, keyToCss, tr }) => {
         console.log("dashboard fixed!");
       }
       requestAnimationFrame(() => { $unfuck() });
-      unsafeWindow.tumblr.on('navigation', () => requestAnimationFrame(() => {
-        $unfuck().catch((e) => { window.setTimeout($unfuck, 400); });
-      }));
+      unsafeWindow.tumblr.on('navigation', () => requestAnimationFrame(() => 
+        window.setTimeout($unfuck().catch((e) => window.setTimeout($unfuck, 400)), 400)
+      ));
 });
 async function getUtilities() {
       let retries = 0;

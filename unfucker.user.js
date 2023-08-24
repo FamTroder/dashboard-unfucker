@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         dashboard unfucker
-// @version      3.6.3
+// @version      3.6.5
 // @description  no more shitty twitter ui for pc
 // @author       dragongirlsnout
 // @match        https://www.tumblr.com/*
@@ -15,8 +15,8 @@
 /* globals tumblr */
 
 'use strict';
-console.log("HEllo fuckers!!!");
-const version = "3.6.3";
+
+const version = "3.6.5";
 const type = "a";
 const updateSrc = "https://raw.githubusercontent.com/enchanted-sword/dashboard-unfucker/main/unfucker.user.js";
 var $ = window.jQuery;
@@ -36,14 +36,15 @@ let featureSet = [
     {"name": "experimentalBlockEditorIsOnlyEditor", "value": false},
     {"name": "tumblrEditorForceTextPostType", "value": false},
     {"name": "configurableTabbedDash", "value": true},
-    {"name": "crowdsignalPollsNpf", "value": true},
-    {"name": "crowdsignalPollsCreate", "value": true},
     {"name": "allowAddingPollsToReblogs", "value": true},
     {"name": "tagSuggestionTwoStepDialog", "value": false},
     {"name": "redpopUnreadNotificationsOnTab", "value": false},
     {"name": "reblogRedesignNew", "value": false},
+    {"name": "crowdsignalPollsNpf", "value": true},
+    {"name": "crowdsignalPollsCreate", "value": true},
     {"name": "adFreeCtaBanner", "value": false}
 ];
+
 const storageAvailable = (type) => { //thanks mdn web docs!
     let storage;
     try {
@@ -85,12 +86,12 @@ if (storageAvailable("localStorage")
         {"name": "experimentalBlockEditorIsOnlyEditor", "value": !pref[11].value},
         {"name": "tumblrEditorForceTextPostType", "value": !pref[11].value},
         {"name": "configurableTabbedDash", "value": pref[12].value?true:false},
-        {"name": "crowdsignalPollsNpf", "value": pref[13].value?true:false},
-        {"name": "crowdsignalPollsCreate", "value": pref[13].value?true:false},
         {"name": "allowAddingPollsToReblogs", "value": pref[13].value?true:false},
         {"name": "tagSuggestionTwoStepDialog", "value": !pref[14].value},
         {"name": "redpopUnreadNotificationsOnTab", "value": !pref[15].value},
         {"name": "reblogRedesignNew", "value": !pref[16].value},
+        {"name": "crowdsignalPollsNpf", "value": true},
+        {"name": "crowdsignalPollsCreate", "value": true},
         {"name": "adFreeCtaBanner", "value": false}
     ];
 }
@@ -154,9 +155,11 @@ $(document).ready(() => {
                 let $post = $(post);
                 let $header = $post.find(`header${keyToCss("header")}`);
                 if (!$header.find(keyToCss("rebloggedFromName")).length
-                    && !$header.find(keyToCss("avatar")).length) {
-                    $label = $post.find(keyToCss("label")).eq(0).clone();
+                    && $header.find(keyToCss("reblogIcon")).length) {
+                    $header.find($(keyToCss("followButton"))).eq(0).hide();
+                    let $label = $post.find(keyToCss("label")).eq(0).clone();
                     $label.insertAfter($header.find(keyToCss("reblogIcon")));
+                    $label.css({display: "inline", marginLeft: "5px"});
                     $label.find(keyToCss("attribution")).css("color", "rgba(var(--black),.65)")
                 }
             }
@@ -430,11 +433,11 @@ $(document).ready(() => {
                             </li>
                             <li>
                                 <span>re-add unread post notifications to the corner of the home icon</span>
-                                <input class="configInput" type="checkbox" id="__c16" name="15" value=${configPreferences[15].value}>
+                                <input class="configInput" type="checkbox" id="__c16" name="15" ${configPreferences[15].value}>
                             </li>
                             <li>
                                 <span>revert post header changes</span>
-                                <input class="configInput" type="checkbox" id="__c17" name="16" value=${configPreferences[16].value}>
+                                <input class="configInput" type="checkbox" id="__c17" name="16" ${configPreferences[16].value}>
                             </li>
                         </ul>
                     </div>
@@ -483,6 +486,11 @@ $(document).ready(() => {
                         $(keyToCss("sidebarItem")).has(keyToCss("radar")).toggle(!$("#__c3").is(":checked"));
                     });
                 });
+            }
+            if (!$("#__c6").is(":checked")) {
+                $("#__cta").children().has("#__c11,#__c17").hide();
+                if ($("#__c11").is(":checked")) $("#__c11").trigger("click");
+                if ($("#__c17").is(":checked")) $("#__c17").trigger("click");
             }
             if ($("#__c8").is(":checked")) {
                 $("#__s").text(`
