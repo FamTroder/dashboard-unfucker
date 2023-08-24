@@ -85,8 +85,8 @@ if (storageAvailable("localStorage")
         {"name": "messagingRedesign", "value": !pref[10].value},
         {"name": "experimentalBlockEditorIsOnlyEditor", "value": !pref[11].value},
         {"name": "tumblrEditorForceTextPostType", "value": !pref[11].value},
-        {"name": "configurableTabbedDash", "value": pref[12].value?true:false},
-        {"name": "allowAddingPollsToReblogs", "value": pref[13].value?true:false},
+        {"name": "configurableTabbedDash", "value": pref[12].value ? true : false},
+        {"name": "allowAddingPollsToReblogs", "value": pref[13].value ? true : false},
         {"name": "tagSuggestionTwoStepDialog", "value": !pref[14].value},
         {"name": "redpopUnreadNotificationsOnTab", "value": !pref[15].value},
         {"name": "reblogRedesignNew", "value": !pref[16].value},
@@ -123,7 +123,11 @@ Object.defineProperty(unsafeWindow, "___INITIAL_STATE___", { // thanks twilight-
     configurable: true,
 });
 const waitFor = (selector, retried = 0,) => new Promise((resolve) => {
-    if ($(selector).length) { resolve() } else if (retried < 25) { requestAnimationFrame(() => waitFor(selector, retried + 1).then(resolve)) }
+    if ($(selector).length) {
+        resolve()
+    } else if (retried < 25) {
+        requestAnimationFrame(() => waitFor(selector, retried + 1).then(resolve))
+    }
 });
 waitFor("head").then(() => {
     const style = document.createElement("style");
@@ -146,7 +150,7 @@ const updatePreferences = (arr) => {
 const isDashboard = () => ["dashboard", ""].includes(location.pathname.split("/")[1]);
 
 $(document).ready(() => {
-    getUtilities().then(({ keyToCss, keyToClasses }) => {
+    getUtilities().then(({keyToCss, keyToClasses}) => {
         const postSelector = "[tabindex='-1'][data-id] article";
         const newNodes = [];
         const target = document.getElementById("root");
@@ -167,23 +171,22 @@ $(document).ready(() => {
         const sortPosts = () => {
             const nodes = newNodes.splice(0);
             if (nodes.length !== 0 && (nodes.some(node => node.matches(postSelector) || node.querySelector(postSelector) !== null))) {
-              const posts = [
-                ...nodes.filter(node => node.matches(postSelector)),
-                ...nodes.flatMap(node => [...node.querySelectorAll(postSelector)])
-              ].filter((value, index, array) => index === array.indexOf(value));
-              fixHeader(posts);
-            }
-            else return
+                const posts = [
+                    ...nodes.filter(node => node.matches(postSelector)),
+                    ...nodes.flatMap(node => [...node.querySelectorAll(postSelector)])
+                ].filter((value, index, array) => index === array.indexOf(value));
+                fixHeader(posts);
+            } else return
         }
         const observer = new MutationObserver(mutations => {
             const nodes = mutations
-                .flatMap(({ addedNodes }) => [...addedNodes])
+                .flatMap(({addedNodes}) => [...addedNodes])
                 .filter(node => node instanceof Element)
                 .filter(node => node.isConnected);
             newNodes.push(...nodes);
             sortPosts();
-          })
-        observer.observe(target, { childList: true, subtree: true });    
+        })
+        observer.observe(target, {childList: true, subtree: true});
         var $styleElement = $("<style id='__s'>");
         $styleElement.appendTo("html");
         $styleElement.text(`
@@ -258,7 +261,9 @@ $(document).ready(() => {
             } else if (!$(keyToCss("main")).length) {
                 console.log("page not loaded, retrying...");
                 throw "page not loaded";
-            } else { console.log("unfucking dashboard...") }
+            } else {
+                console.log("unfucking dashboard...")
+            }
             if ("/dashboard/following" === location.pathname) {
                 waitFor(keyToCss("timelineOptions")).then(() => {
                     if ($(keyToCss("timelineOptionsItemWrapper")).first().has("a[href='/dashboard/stuff_for_you']").length ? true : false) {
@@ -269,25 +274,25 @@ $(document).ready(() => {
                 });
             }
             var configPreferences = [
-                { type: "checkbox", value: "" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "checkbox", value: "checked" },
-                { type: "number", value: "20"},
-                { type: "number", value: "50"}
+                {type: "checkbox", value: ""},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "checkbox", value: "checked"},
+                {type: "number", value: "20"},
+                {type: "number", value: "50"}
             ];
             if (storageAvailable("localStorage")) {
                 if (!localStorage.getItem("configPreferences") || JSON.parse(localStorage.getItem("configPreferences")).length < configPreferences.length) {
@@ -450,29 +455,32 @@ $(document).ready(() => {
             $("#__cb").on("click", () => {
                 if ($("#__c").is(":hidden")) {
                     $("#__cb svg").css("--icon-color-primary", "rgb(var(--white-on-dark))");
-                } else { $("#__cb svg").css("--icon-color-primary", "rgba(var(--white-on-dark),.65)") }
+                } else {
+                    $("#__cb svg").css("--icon-color-primary", "rgba(var(--white-on-dark),.65)")
+                }
                 $("#__c").toggle();
             });
             $("#__ab").on("click", () => {
                 if ($("#__a").is(":hidden")) {
                     $("#__ab svg").css("--icon-color-primary", "rgb(var(--white-on-dark))");
-                } else { $("#__ab svg").css("--icon-color-primary", "rgba(var(--white-on-dark),.65)") }
+                } else {
+                    $("#__ab svg").css("--icon-color-primary", "rgba(var(--white-on-dark),.65)")
+                }
                 $("#__a").toggle();
             });
             $(".configInput").on("change", function () {
-                const curPreference= configPreferences[Number($(this).attr("name"))];
+                const curPreference = configPreferences[Number($(this).attr("name"))];
                 console.log("change: ");
                 console.log(curPreference);
                 console.log($(this));
-                if (curPreference.type === "checkbox"){
+                if (curPreference.type === "checkbox") {
                     curPreference.value = $(this).is(":checked") ? "checked" : "";
                     checkboxEvent($(this).attr("id"), $(this).is(":checked"));
-                }
-                else if (curPreference.type === "number") {
+                } else if (curPreference.type === "number") {
                     curPreference.value = Number($(this).prop("value"));
                     updatePreferences(configPreferences);
-                    $(keyToCss("conversationWindow")).css("width",  $("#__chatw").prop("value") + "vw");
-                    $(keyToCss("conversationWindow")).css("height",  $("#__chath").prop("value") + "vh");
+                    $(keyToCss("conversationWindow")).css("width", $("#__chatw").prop("value") + "vw");
+                    $(keyToCss("conversationWindow")).css("height", $("#__chath").prop("value") + "vh");
                 }
             });
             $(keyToCss("timelineHeader")).toggle(!$("#__c1").is(":checked"));
@@ -498,8 +506,8 @@ $(document).ready(() => {
                     ${keyToCss("navItem")}:has(use[href="#managed-icon__earth"]) { display: none !important; }
                 `);
             }
-            $(keyToCss("conversationWindow")).css("width",  $("#__chatw").prop("value") + "vw");
-            $(keyToCss("conversationWindow")).css("width",  $("#__chath").prop("value") + "vh");
+            $(keyToCss("conversationWindow")).css("width", $("#__chatw").prop("value") + "vw");
+            $(keyToCss("conversationWindow")).css("height", $("#__chath").prop("value") + "vh");
 
             console.log("dashboard fixed!");
         }
@@ -525,6 +533,6 @@ $(document).ready(() => {
         const cssMap = await unsafeWindow.tumblr.getCssMap();
         const keyToClasses = (...keys) => keys.flatMap(key => cssMap[key]).filter(Boolean);
         const keyToCss = (...keys) => `:is(${keyToClasses(...keys).map(className => `.${className}`).join(", ")})`;
-        return { keyToCss, keyToClasses };
+        return {keyToCss, keyToClasses};
     }
 });
