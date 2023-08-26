@@ -85,8 +85,8 @@ if (storageAvailable("localStorage")
         {"name": "messagingRedesign", "value": !pref[10].value},
         {"name": "experimentalBlockEditorIsOnlyEditor", "value": !pref[11].value},
         {"name": "tumblrEditorForceTextPostType", "value": !pref[11].value},
-        {"name": "configurableTabbedDash", "value": pref[12].value ? true : false},
-        {"name": "allowAddingPollsToReblogs", "value": pref[13].value ? true : false},
+        {"name": "configurableTabbedDash", "value": pref[12].value?true:false},
+        {"name": "allowAddingPollsToReblogs", "value": pref[13].value?true:false},
         {"name": "tagSuggestionTwoStepDialog", "value": !pref[14].value},
         {"name": "redpopUnreadNotificationsOnTab", "value": !pref[15].value},
         {"name": "reblogRedesignNew", "value": !pref[16].value},
@@ -123,11 +123,7 @@ Object.defineProperty(unsafeWindow, "___INITIAL_STATE___", { // thanks twilight-
     configurable: true,
 });
 const waitFor = (selector, retried = 0,) => new Promise((resolve) => {
-    if ($(selector).length) {
-        resolve()
-    } else if (retried < 25) {
-        requestAnimationFrame(() => waitFor(selector, retried + 1).then(resolve))
-    }
+    if ($(selector).length) { resolve() } else if (retried < 25) { requestAnimationFrame(() => waitFor(selector, retried + 1).then(resolve)) }
 });
 waitFor("head").then(() => {
     const style = document.createElement("style");
@@ -150,7 +146,7 @@ const updatePreferences = (arr) => {
 const isDashboard = () => ["dashboard", ""].includes(location.pathname.split("/")[1]);
 
 $(document).ready(() => {
-    getUtilities().then(({keyToCss, keyToClasses}) => {
+    getUtilities().then(({ keyToCss }) => {
         const postSelector = "[tabindex='-1'][data-id] article";
         const newNodes = [];
         const target = document.getElementById("root");
@@ -180,13 +176,13 @@ $(document).ready(() => {
         }
         const observer = new MutationObserver(mutations => {
             const nodes = mutations
-                .flatMap(({addedNodes}) => [...addedNodes])
+                .flatMap(({ addedNodes }) => [...addedNodes])
                 .filter(node => node instanceof Element)
                 .filter(node => node.isConnected);
             newNodes.push(...nodes);
             sortPosts();
-        })
-        observer.observe(target, {childList: true, subtree: true});
+          })
+        observer.observe(target, { childList: true, subtree: true });
         var $styleElement = $("<style id='__s'>");
         $styleElement.appendTo("html");
         $styleElement.text(`
@@ -261,9 +257,7 @@ $(document).ready(() => {
             } else if (!$(keyToCss("main")).length) {
                 console.log("page not loaded, retrying...");
                 throw "page not loaded";
-            } else {
-                console.log("unfucking dashboard...")
-            }
+            } else { console.log("unfucking dashboard...") }
             if ("/dashboard/following" === location.pathname) {
                 waitFor(keyToCss("timelineOptions")).then(() => {
                     if ($(keyToCss("timelineOptionsItemWrapper")).first().has("a[href='/dashboard/stuff_for_you']").length ? true : false) {
