@@ -267,6 +267,7 @@ $(document).ready(() => {
                     }
                 });
             }
+            $(keyToCss("timelineChangeOption")).filter(() => $(this).children()).filter(":contains('Luffy')").hide();
             var configPreferences = [
                 {type: "checkbox", value: ""},
                 {type: "checkbox", value: "checked"},
