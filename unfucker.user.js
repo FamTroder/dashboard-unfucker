@@ -246,6 +246,7 @@ $(document).ready(() => {
             }
         }
 
+
         async function $unfuck() {
             if ($("#__c").length) {
                 console.log("page already processed")
@@ -267,7 +268,7 @@ $(document).ready(() => {
                     }
                 });
             }
-            $(keyToCss("timelineChangeOption")).filter(() => $(this).children()).filter(":contains('Luffy')").hide();
+            $(keyToCss("timelineOptionsItemWrapper")).has("a[href='/dashboard/netflix_one_piece_campaign']").hide();
             var configPreferences = [
                 {type: "checkbox", value: ""},
                 {type: "checkbox", value: "checked"},
@@ -463,6 +464,20 @@ $(document).ready(() => {
                 }
                 $("#__a").toggle();
             });
+            var $chatWrapper = $(keyToCss("lowerRightContentContainer"));
+            var chatObserver = new MutationObserver(function(mutations){
+                console.log("fuck???");
+                mutations.forEach(function(mutation) {
+                    if ($(mutation.target).has(keyToCss("hasOpenConversations"))){
+                        $(keyToCss("conversationWindow")).css("width", $("#__chatw").prop("value") + "vw");
+                        $(keyToCss("conversationWindow")).css("height", $("#__chath").prop("value") + "vh");
+                    }
+                })
+            });
+            chatObserver.observe($chatWrapper[0], {
+                attributes : true,
+                attributeFilter : ['class']
+            } );
             $(".configInput").on("change", function () {
                 const curPreference = configPreferences[Number($(this).attr("name"))];
                 console.log("change: ");
